@@ -1,414 +1,63 @@
 ---
-title: "Using R to predict behaviors, demands and dynamics through times and distances in two cases: Predict behavior of police agent (Predator) and suspect (his prey) in a zone; Predict Blood Group_A Demand (BGAD) “Biochemical Oxygen Demand (BOD)” and Group_A (GA) “oxygen (O2)” dynamics in village “River zone”"
+title: "R to predict the chaos in the atmosphere"
 author: Hadarou Sare
-subtitle: Subtitle here if desired
+
 ---
 
 # Introduction
-One of the of advantage of coding is to be able to extract the exact information, predict behaviors, predict demands based on people’s needs, find the dynamic of a system based on diverse factors as quickly as possible in order to propose a range of solutions to leaders who might decide what to do in any given situation.
-In this project, we studied the behavior of police agents through time in an area whose mission is to capture a suspect. Note that every suspect has also a behavior which change through time and we will examine that too. In addition to that, we will examine the availability of a blood Group A through time in a village and the demand of that blood group A in the same village through time as well.
+One of the of advantage of coding is to be able to extract the exact informatio and predict natural phenomenon behaviors as well as the impact of human being on the environment in order to find the right solution at the right time.In that logic, R programing seem to be a suitable tool to propose a range of solutions to leaders who might decide what to do in any given situationin general but in the atmospheric behavior in particular which might slow not only the economy but also the conquest of new frontiers in space.
+In this project, we are interested in studying the chaos in the atmosphere because its behavior is extremly important for space exploration. In fact any launch system built to send astronaut in space or deliver satelitte in space will take off if and only if the atmospheric conditions are favorable.
   
 
 # Materials and methods
 
-Data
-I created my own data but those data are incorporated in the code I will developed
+I firstly install the differential equation package followed by the Desolve packages. I then used the Lorenz function to specify the parameters in X-Y-Z direction which is 3D. After that I created my parameters (a, b, and c) I will use as well as the sequence time before ploting my results.
 
-Method
-I used the differential equation functions in R to get all results I was looking for in this project.  For the first case, the ODE function was used in R. In the code, a model equation is shown. The flux due to diffusion, the rate of change, the model parameters, the condition are implemented. For the second case, the model equation, the model parameters, and the conditions are implemented.
+#Load required packages
 
-
-
-## =============================================================================
-## FORCING FUNCTION: The sediment oxygen consumption example - R-code:
-#Page 39-42
-## =============================================================================
-## Forcing function data
-Flux <- matrix(ncol=2,byrow=TRUE,data=c(
-  1, 0.654, 11, 0.167, 21, 0.060, 41, 0.070, 73,0.277, 83,0.186,
-  93,0.140,103, 0.255, 113, 0.231,123, 0.309,133,1.127,143,1.923,
-  153,1.091,163,1.001, 173, 1.691,183, 1.404,194,1.226,204,0.767,
-  214, 0.893,224,0.737, 234,0.772,244, 0.726,254,0.624,264,0.439,
-  274,0.168,284 ,0.280, 294,0.202,304, 0.193,315,0.286,325,0.599,
-  335, 1.889,345, 0.996,355,0.681,365,1.135))
-parms <- c(k=0.01)
-times <- 1:365
-## the model
-sediment <- function( t, O2, k)
-  list (c(Depo(t) - k * O2), depo = Depo(t))
-# the forcing functions; rule = 2 avoids NaNs in interpolation
-Depo <- approxfun(x = Flux[,1], y = Flux[,2], method = "linear", rule = 2)
-Out <- ode(times = times, func = sediment, y = c(O2 = 63), parms = parms)
-## same forcing functions, now constant interpolation
-Depo <- approxfun(x = Flux[,1], y = Flux[,2], method = "constant",
-                  f = 0.5, rule = 2)
-Out2 <- ode(times = times, func = sediment, y = c(O2 = 63), parms = parms)
-mf <- par(mfrow = c(2, 1))
-plot (Out, which = "depo", type = "l", lwd = 2, mfrow = NULL)
-lines(Out2[,"time"], Out2[,"depo"], col = "red", lwd = 2)
-plot (Out, which = "O2", type = "l", lwd = 2, mfrow = NULL)
-lines(Out2[,"time"], Out2[,"O2"], col = "red", lwd = 2)
-## =============================================================================
-## SCOC is the same model, as implemented in FORTRAN
-## =============================================================================
-out<- SCOC(times, parms = parms, Flux = Flux)
-plot(out[,"time"], out[,"Depo"], type = "l", col = "red")
-lines(out[,"time"], out[,"Mineralisation"], col = "blue")
-## Constant interpolation of forcing function - left side of interval
-fcontrol <- list(method = "constant")
-out2 <- SCOC(times, parms = parms, Flux = Flux, fcontrol = fcontrol)
-plot(out2[,"time"], out2[,"Depo"], type = "l", col = "red")
-lines(out2[,"time"], out2[,"Mineralisation"], col = "blue")
-## Not run:
-## =============================================================================
-## show examples (see respective help pages for details)
-## =============================================================================
-example(aquaphy)
-## show package vignette with tutorial about how to use compiled models
-## + source code of the vignette
-## + directory with C and FORTRAN sources
-vignette("compiledCode")
-edit(vignette("compiledCode"))
-browseURL(paste(system.file(package = "deSolve"), "/doc", sep = ""))
-## End(Not run)
+install.packages("ctv")
+ctv::install.views("DifferentialEquations")
+library(deSolve)
 
 
+#Download and clean required data
 
-#                                      RESUTS
-In both case, the results are shown in pictures. The results show the behavior of polices agents and the behavior of the suspect through time in case one. In case two, the result show the demand of the blood Group A as well as its availability in the village through time a distance. I show here how the results will look like.
 
-# Additional Code required to plot
-
-## =======================================================================
-## example 1
-## a predator and its prey diffusing on a flat surface
-## in concentric circles
-## 1-D model with using cylindrical coordinates
-## Lotka-Volterra type biology
-## =======================================================================
-## ================
-## Model equations
-## ================
-lvmod <- function (time, state, parms, N, rr, ri, dr, dri) {
-  with (as.list(parms), {
-    PREY <- state[1:N]
-    PRED <- state[(N+1):(2*N)]
-    ## Fluxes due to diffusion
-    ## at internal and external boundaries: zero gradient
-    FluxPrey <- -Da * diff(c(PREY[1], PREY, PREY[N]))/dri
-    FluxPred <- -Da * diff(c(PRED[1], PRED, PRED[N]))/dri
-    ## Biology: Lotka-Volterra model
-    Ingestion <- rIng * PREY * PRED
-    GrowthPrey <- rGrow * PREY * (1-PREY/cap)
-    MortPredator <- rMort * PRED
-    ## Rate of change = Flux gradient + Biology
-    dPREY <- -diff(ri * FluxPrey)/rr/dr +
-      GrowthPrey - Ingestion
-    dPRED <- -diff(ri * FluxPred)/rr/dr +
-      Ingestion * assEff - MortPredator
-    return (list(c(dPREY, dPRED)))
+Lorenz <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    dX <- a * X + Y * Z
+    dY <- b * (Y - Z)
+    dZ <- -X * Y + c * Y - Z
+    list(c(dX, dY, dZ))
   })
 }
-## ==================
-## Model application
-## ==================
-## model parameters:
-R <- 20 # total radius of surface, m
-N <- 100 # 100 concentric circles
-dr <- R/N # thickness of each layer
-r <- seq(dr/2,by = dr,len = N) # distance of center to mid-layer
-ri <- seq(0,by = dr,len = N+1) # distance to layer interface
-dri <- dr # dispersion distances
-parms <- c(Da = 0.05, # m2/d, dispersion coefficient
-           rIng = 0.2, # /day, rate of ingestion
-           rGrow = 1.0, # /day, growth rate of prey
-           rMort = 0.2 , # /day, mortality rate of pred
-           assEff = 0.5, # -, assimilation efficiency
-           cap = 10) # density, carrying capacity
-## Initial conditions: both present in central circle (box 1) only
-state <- rep(0, 2 * N)
-state[1] <- state[N + 1] <- 10
-## RUNNING the model:
-times <- seq(0, 200, by = 1) # output wanted at these time intervals
-## the model is solved by the two implemented methods:
-## 1. Default: banded reformulation
-print(system.time(
-  out <- ode.1D(y = state, times = times, func = lvmod, parms = parms,
-                nspec = 2, names = c("PREY", "PRED"),
-                N = N, rr = r, ri = ri, dr = dr, dri = dri)
-))
-## 2. Using sparse method
-print(system.time(
-  out2 <- ode.1D(y = state, times = times, func = lvmod, parms = parms,
-                 nspec = 2, names = c("PREY","PRED"),
-                 N = N, rr = r, ri = ri, dr = dr, dri = dri,
-                 method = "lsodes")
-))
-## ================
-## Plotting output
-## ================
-# the data in 'out' consist of: 1st col times, 2-N+1: the prey
-# N+2:2*N+1: predators
-PREY <- out[, 2:(N + 1)]
-filled.contour(x = times, y = r, PREY, color = topo.colors,
-               xlab = "time, days", ylab = "Distance, m",
-               main = "Prey density")
-# similar:
-image(out, which = "PREY", grid = r, xlab = "time, days",
-      legend = TRUE, ylab = "Distance, m", main = "Prey density")
-image(out2, grid = r)
-# summaries of 1-D variables
-summary(out)
-# 1-D plots:
-matplot.1D(out, type = "l", subset = time == 10)
-matplot.1D(out, type = "l", subset = time > 10 & time < 20)
-## =======================================================================
-## Example 2.
-## Biochemical Oxygen Demand (BOD) and oxygen (O2) dynamics
-## in a river
-## =======================================================================
-## ================
-## Model equations
-## ================
-O2BOD <- function(t, state, pars) {
-  BOD <- state[1:N]
-  O2 <- state[(N+1):(2*N)]
-  ## BOD dynamics
-  FluxBOD <- v * c(BOD_0, BOD) # fluxes due to water transport
-  FluxO2 <- v * c(O2_0, O2)
-  BODrate <- r * BOD # 1-st order consumption
-  ## rate of change = flux gradient - consumption + reaeration (O2)
-  dBOD <- -diff(FluxBOD)/dx - BODrate
-  dO2 <- -diff(FluxO2)/dx - BODrate + p * (O2sat-O2)
-  return(list(c(dBOD = dBOD, dO2 = dO2)))
-}
-## ==================
-## Model application
-## ==================
-## parameters
-dx <- 25 # grid size of 25 meters
-v <- 1e3 # velocity, m/day
-x <- seq(dx/2, 5000, by = dx) # m, distance from river
-N <- length(x)
-r <- 0.05 # /day, first-order decay of BOD
-p <- 0.5 # /day, air-sea exchange rate
-O2sat <- 300 # mmol/m3 saturated oxygen conc
-O2_0 <- 200 # mmol/m3 riverine oxygen conc
-BOD_0 <- 1000 # mmol/m3 riverine BOD concentration
-## initial conditions:
-state <- c(rep(200, N), rep(200, N))
-times <- seq(0, 20, by = 0.1)
-## running the model
-## step 1 : model spinup
-out <- ode.1D(y = state, times, O2BOD, parms = NULL,
-              nspec = 2, names = c("BOD", "O2"))
-## ================
-## Plotting output
-## ================
-## select oxygen (first column of out:time, then BOD, then O2
-O2 <- out[, (N + 2):(2 * N + 1)]
-color = topo.colors
-filled.contour(x = times, y = x, O2, color = color, nlevels = 50,
-               xlab = "time, days", ylab = "Distance from river, m",
-               main = "Oxygen")
-## or quicker plotting:
-image(out, grid = x, xlab = "time, days", ylab = "Distance from river, m")
+
+parameters <- c(a = -8/3, b = -10, c = 28)
+state <- c(X = 1, Y = 1, Z = 1)
+times <- seq(0, 100, by = 0.01)
+out <- ode(y = state, times = times, func = Lorenz, parms = parameters)
+plot(out)
 
 
-## Need to run the code
-## =============================================================================
-## FORCING FUNCTION: The sediment oxygen consumption example - R-code:
-#Page 39-42
-## =============================================================================
-## Forcing function data
-Flux <- matrix(ncol=2,byrow=TRUE,data=c(
-  1, 0.654, 11, 0.167, 21, 0.060, 41, 0.070, 73,0.277, 83,0.186,
-  93,0.140,103, 0.255, 113, 0.231,123, 0.309,133,1.127,143,1.923,
-  153,1.091,163,1.001, 173, 1.691,183, 1.404,194,1.226,204,0.767,
-  214, 0.893,224,0.737, 234,0.772,244, 0.726,254,0.624,264,0.439,
-  274,0.168,284 ,0.280, 294,0.202,304, 0.193,315,0.286,325,0.599,
-  335, 1.889,345, 0.996,355,0.681,365,1.135))
-parms <- c(k=0.01)
-times <- 1:365
-## the model
-sediment <- function( t, O2, k)
-  list (c(Depo(t) - k * O2), depo = Depo(t))
-# the forcing functions; rule = 2 avoids NaNs in interpolation
-Depo <- approxfun(x = Flux[,1], y = Flux[,2], method = "linear", rule = 2)
-Out <- ode(times = times, func = sediment, y = c(O2 = 63), parms = parms)
-## same forcing functions, now constant interpolation
-Depo <- approxfun(x = Flux[,1], y = Flux[,2], method = "constant",
-                  f = 0.5, rule = 2)
-Out2 <- ode(times = times, func = sediment, y = c(O2 = 63), parms = parms)
-mf <- par(mfrow = c(2, 1))
-plot (Out, which = "depo", type = "l", lwd = 2, mfrow = NULL)
-lines(Out2[,"time"], Out2[,"depo"], col = "red", lwd = 2)
-plot (Out, which = "O2", type = "l", lwd = 2, mfrow = NULL)
-lines(Out2[,"time"], Out2[,"O2"], col = "red", lwd = 2)
-## =============================================================================
-## SCOC is the same model, as implemented in FORTRAN
-## =============================================================================
-out<- SCOC(times, parms = parms, Flux = Flux)
-plot(out[,"time"], out[,"Depo"], type = "l", col = "red")
-lines(out[,"time"], out[,"Mineralisation"], col = "blue")
-## Constant interpolation of forcing function - left side of interval
-fcontrol <- list(method = "constant")
-out2 <- SCOC(times, parms = parms, Flux = Flux, fcontrol = fcontrol)
-plot(out2[,"time"], out2[,"Depo"], type = "l", col = "red")
-lines(out2[,"time"], out2[,"Mineralisation"], col = "blue")
-## Not run:
-## =============================================================================
-## show examples (see respective help pages for details)
-## =============================================================================
-example(aquaphy)
-## show package vignette with tutorial about how to use compiled models
-## + source code of the vignette
-## + directory with C and FORTRAN sources
-vignette("compiledCode")
-edit(vignette("compiledCode"))
-browseURL(paste(system.file(package = "deSolve"), "/doc", sep = ""))
-## End(Not run)
+# Results
 
-##MY CODES
-## =======================================================================
-## example 1
-## Case of police agent(Predator) and a suspect (his) prey  diffusing on a flat surface
-## in concentric circles
-## 1-D model with using cylindrical coordinates
-## Lotka-Volterra type biology
-## =======================================================================
-## ================
-## Model equations
-## ================
-lvmod <- function (time, state, parms, N, rr, ri, dr, dri) {
-  with (as.list(parms), {
-    PREY <- state[1:N]
-    PRED <- state[(N+1):(2*N)]
-    ## Fluxes due to diffusion
-    ## at internal and external boundaries: zero gradient
-    FluxPrey <- -Da * diff(c(PREY[1], PREY, PREY[N]))/dri
-    FluxPred <- -Da * diff(c(PRED[1], PRED, PRED[N]))/dri
-    ## Biology: Lotka-Volterra model
-    Ingestion <- rIng * PREY * PRED
-    GrowthPrey <- rGrow * PREY * (1-PREY/cap)
-    MortPredator <- rMort * PRED
-    ## Rate of change = Flux gradient + Biology
-    dPREY <- -diff(ri * FluxPrey)/rr/dr +
-      GrowthPrey - Ingestion
-    dPRED <- -diff(ri * FluxPred)/rr/dr +
-      Ingestion * assEff - MortPredator
-    return (list(c(dPREY, dPRED)))
-  })
-}
-## ==================
-## Model application
-## ==================
-## model parameters:
-R <- 20 # total radius of surface, m
-N <- 100 # 100 concentric circles
-dr <- R/N # thickness of each layer
-r <- seq(dr/2,by = dr,len = N) # distance of center to mid-layer
-ri <- seq(0,by = dr,len = N+1) # distance to layer interface
-dri <- dr # dispersion distances
-parms <- c(Da = 0.05, # m2/d, dispersion coefficient
-           rIng = 0.2, # /day, rate of ingestion
-           rGrow = 1.0, # /day, growth rate of prey
-           rMort = 0.2 , # /day, mortality rate of pred
-           assEff = 0.5, # -, assimilation efficiency
-           cap = 10) # density, carrying capacity
-## Initial conditions: both present in central circle (box 1) only
-state <- rep(0, 2 * N)
-state[1] <- state[N + 1] <- 10
-## RUNNING the model:
-times <- seq(0, 200, by = 1) # output wanted at these time intervals
-## the model is solved by the two implemented methods:
-## 1. Default: banded reformulation
-print(system.time(
-  out <- ode.1D(y = state, times = times, func = lvmod, parms = parms,
-                nspec = 2, names = c("SUSPECT", "POLICE"),
-                N = N, rr = r, ri = ri, dr = dr, dri = dri)
-))
-## 2. Using sparse method
-print(system.time(
-  out2 <- ode.1D(y = state, times = times, func = lvmod, parms = parms,
-                 nspec = 2, names = c("SUSPECT","POLICE"),
-                 N = N, rr = r, ri = ri, dr = dr, dri = dri,
-                 method = "lsodes")
-))
-## ================
-## Plotting output
-## ================
-# the data in 'out' consist of: 1st col times, 2-N+1: the prey
-# N+2:2*N+1: predators
-PREY <- out[, 2:(N + 1)]
-filled.contour(x = times, y = r, PREY, color = topo.colors,
-               xlab = "time, days", ylab = "Distance, m",
-               main = "Suspect density")
-# similar:
-image(out, which = "SUSPECT", grid = r, xlab = "time, days",
-      legend = TRUE, ylab = "Distance, m", main = "Suspect density")
-image(out2, grid = r)
-# summaries of 1-D variables
-summary(out)
-# 1-D plots:
-matplot.1D(out, type = "l", subset = time == 10)
-matplot.1D(out, type = "l", subset = time > 10 & time < 20)
-## =======================================================================
-## Example 2.
-## the case of Blood Group_A Demand (BGAD) "Biochemical Oxygen Demand (BOD)" 
-## and Group_A (GA) "oxygen (O2)" dynamics in village "River zone"
-## =======================================================================
-## ================
-## Model equations
-## ================
-O2BOD <- function(t, state, pars) {
-  BOD <- state[1:N]
-  O2 <- state[(N+1):(2*N)]
-  ## BOD dynamics
-  FluxBOD <- v * c(BOD_0, BOD) # fluxes due to water transport
-  FluxO2 <- v * c(O2_0, O2)
-  BODrate <- r * BOD # 1-st order consumption
-  ## rate of change = flux gradient - consumption + reaeration (O2)
-  dBOD <- -diff(FluxBOD)/dx - BODrate
-  dO2 <- -diff(FluxO2)/dx - BODrate + p * (O2sat-O2)
-  return(list(c(dBOD = dBOD, dO2 = dO2)))
-}
-## ==================
-## Model application
-## ==================
-## parameters
-dx <- 25 # grid size of 25 meters
-v <- 1e3 # velocity, m/day
-x <- seq(dx/2, 5000, by = dx) # m, distance from river
-N <- length(x)
-r <- 0.05 # /day, first-order decay of BOD
-p <- 0.5 # /day, air-sea exchange rate
-O2sat <- 300 # mmol/m3 saturated oxygen conc
-O2_0 <- 200 # mmol/m3 riverine oxygen conc
-BOD_0 <- 1000 # mmol/m3 riverine BOD concentration
-## initial conditions:
-state <- c(rep(200, N), rep(200, N))
-times <- seq(0, 20, by = 0.1)
-## running the model
-## step 1 : model spinup
-out <- ode.1D(y = state, times, O2BOD, parms = NULL,
-              nspec = 2, names = c("BGAD", "Group A"))
-## ================
-## Plotting output
-## ================
-## select oxygen (first column of out:time, then BOD, then O2
-O2 <- out[, (N + 2):(2 * N + 1)]
-color = topo.colors
-filled.contour(x = times, y = x, O2, color = color, nlevels = 50,
-               xlab = "time, days", ylab = "Distance from village, m",
-               main = "Blood Group A")
-## or quicker plotting:
-image(out, grid = x, xlab = "time, days", ylab = "Distance from river, m")
+parameters <- c(a = -8/3, b = -10, c = 28)
+state <- c(X = 1, Y = 1, Z = 1)
+times <- seq(0, 100, by = 0.01)
+out <- ode(y = state, times = times, func = Lorenz, parms = parameters)
+plot(out)
 
+#add a 3D figure if package scatterplot3D is available
 
+if (require(scatterplot3d))
+  scatterplot3d(out[,-1], type = "l")
 
+  
+  
 # Conclusions
 
-This study can be applied in diverse domains. Here I showed how R can be used to help protect people by capturing dangerous people who are hiding and fleeing police. I also Predict Blood Group_A Demand (BGAD) “Biochemical Oxygen Demand (BOD)” and Group_A (GA) “oxygen (O2)” dynamics in village “River zone” which will be helpfull to save lifes.
+This study which could be applied in diverse domains show the behavior of the atmosphere wich is usefull to predict not only space activites but also othe human activities on Earth. 
 
 # References
+Soetaert K., Petzoldt T., Setzer R. W., (2019), Solvers for Initial Value Problems of Differential Equations
+('ODE', 'DAE', 'DDE'), 1.24
