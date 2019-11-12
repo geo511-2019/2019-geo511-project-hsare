@@ -1,88 +1,72 @@
 ---
-title: "I have the best titles"
-author: Your name here
-subtitle: Subtitle here if desired
----
+title: "R to predict the chaos in the atmosphere"
+author: Hadarou Sare
+
 
 # Introduction
-My really awesome and complete introduction will go here.  
+One of the of advantage of coding is to be able to extract the exact information and predict natural phenomenon behaviors as well as the impact of human being on the environment in order to find the right solution at the right time. In that logic, R programing seem to be a suitable tool to propose a range of solutions to leaders who might decide what to do in any given situation in general but in the atmospheric behavior in particular which might slow not only the economy but also the conquest of new frontiers in space.
+In this project, we are interested in studying the chaos in the atmosphere because its behavior is extremely important for space exploration. In fact, any launch system built to send astronaut in space or deliver satelitte in space will take off if and only if the atmospheric conditions are favorable.
+ 
 
 # Materials and methods
 
-Narrative and most code will go here.  Describe what you are doing and show how to do it (with code).
-
-You can do bullets like this:
-
-* The first most important thing
-* The second most important thing
-* The third most important thing
-
-You can do numbers like this:
-
-1. The first most important thing
-2. The second most important thing
-3. The third most important thing
-
-See [http://rmarkdown.rstudio.com/](http://rmarkdown.rstudio.com/) for all the amazing things you can do.
+I firstly install the differential equation package followed by the “Desolve” packages. I then used the Lorenz function to specify the parameters in X-Y-Z direction which is 3D. After that I created my parameters (a, b, and c) I will use as well as the sequence time before plotting my results.
 
 
-Here's my first code chunk.
-```{r}
-1+2
-```
 
 Load any required packages in a code chunk (you may need to install some packages):
 
-```{r, message=F, warning=F}
-library(tidyverse)
-library(leaflet)
-library(kableExtra)
-knitr::opts_chunk$set(cache=TRUE)  # cache the results for quick compiling
-```
+
+
+install.packages("ctv")
+ctv::install.views("DifferentialEquations")
+library(deSolve)
+
+
 
 ## Download and clean all required data
-```{r}
-n=20
-data=data.frame(x=runif(n,-180,180),
-                y=runif(n,-60,60),
-                size = runif(n, 5, 20),
-                category = factor(
-                  sample(letters[1:5], n, replace = TRUE)
-                  ),
-                value = rnorm(n))
-```
 
-```{r, results='asis'}
-data %>% 
-  slice(1:10) %>% #show only 1:n rows
-  kable(digits=2,align="c")%>% #make table and round to two digits
-  kable_styling(bootstrap_options = 
-                  c("striped", "hover", "condensed", "responsive")) #apply other formatting
-```
+Lorenz <- function(t, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    dX <- a * X + Y * Z
+    dY <- b * (Y - Z)
+    dZ <- -X * Y + c * Y - Z
+    list(c(dX, dY, dZ))
+  })
+}
+
+parameters <- c(a = -8/3, b = -10, c = 28)
+state <- c(X = 1, Y = 1, Z = 1)
+times <- seq(0, 100, by = 0.01)
+out <- ode(y = state, times = times, func = Lorenz, parms = parameters)
+plot(out)
+
+
+
 
 Add any additional processing steps here.
 
 # Results
 
-Show tables, plots, etc. and describe them.
-
-```{r, fig.width=6, fig.height=3, fig.cap="Map of completely random data"}
-m <- leaflet(data) %>% 
-  addTiles() %>% 
-  addCircleMarkers(~x, ~y, radius = ~size,color = ~as.factor(category)) %>% 
-  addPopups(~x[2], ~y[2], "Random popup")
-m  # a map with the default OSM tile layer
-```
 
 
-```{r}
-data %>% 
-  ggplot(aes(x=x,y=y,col=category))+
-  geom_point()
-```
+parameters <- c(a = -8/3, b = -10, c = 28)
+state <- c(X = 1, Y = 1, Z = 1)
+times <- seq(0, 100, by = 0.01)
+out <- ode(y = state, times = times, func = Lorenz, parms = parameters)
+plot(out)
+
+#add a 3D figure if package scatterplot3D is available
+
+if (require(scatterplot3d))
+  scatterplot3d(out[,-1], type = "l")
+
 
 # Conclusions
 
-What have you learned?  Are there any broader implications?
+This study which could be applied in diverse domains show the behavior of the atmosphere which is useful to predict not only space activities but also other human activities on Earth. 
 
 # References
+Soetaert K., Petzoldt T., Setzer R. W., (2019), Solvers for Initial Value Problems of Differential Equations
+('ODE', 'DAE', 'DDE'), 1.24
+
