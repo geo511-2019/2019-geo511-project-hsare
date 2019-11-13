@@ -2,26 +2,29 @@
 title: "R to predict the chaos in the atmosphere"
 author: Hadarou Sare
 
----
 
 # Introduction
-One of the of advantage of coding is to be able to extract the exact informatio and predict natural phenomenon behaviors as well as the impact of human being on the environment in order to find the right solution at the right time.In that logic, R programing seem to be a suitable tool to propose a range of solutions to leaders who might decide what to do in any given situationin general but in the atmospheric behavior in particular which might slow not only the economy but also the conquest of new frontiers in space.
-In this project, we are interested in studying the chaos in the atmosphere because its behavior is extremly important for space exploration. In fact any launch system built to send astronaut in space or deliver satelitte in space will take off if and only if the atmospheric conditions are favorable.
-  
+One of the of advantage of coding is to be able to extract the exact information and predict natural phenomenon behaviors as well as the impact of human being on the environment in order to find the right solution at the right time. In that logic, R programing seem to be a suitable tool to propose a range of solutions to leaders who might decide what to do in any given situation in general but in the atmospheric behavior in particular which might slow not only the economy but also the conquest of new frontiers in space.
+In this project, we are interested in studying the chaos in the atmosphere because its behavior is extremely important for space exploration. In fact, any launch system built to send astronaut in space or deliver satelitte in space will take off if and only if the atmospheric conditions are favorable.
+ 
 
 # Materials and methods
 
-I firstly install the differential equation package followed by the Desolve packages. I then used the Lorenz function to specify the parameters in X-Y-Z direction which is 3D. After that I created my parameters (a, b, and c) I will use as well as the sequence time before ploting my results.
+I firstly install the differential equation package followed by the “Desolve” packages. I then used the Lorenz function to specify the parameters in X-Y-Z direction which is 3D. After that I created my parameters (a, b, and c) I will use as well as the sequence time before plotting my results.
 
-#Load required packages
+
+
+Load any required packages in a code chunk (you may need to install some packages):
+
+
 
 install.packages("ctv")
 ctv::install.views("DifferentialEquations")
 library(deSolve)
 
 
-#Download and clean required data
 
+## Download and clean all required data
 
 Lorenz <- function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
@@ -39,7 +42,13 @@ out <- ode(y = state, times = times, func = Lorenz, parms = parameters)
 plot(out)
 
 
+
+
+Add any additional processing steps here.
+
 # Results
+
+
 
 parameters <- c(a = -8/3, b = -10, c = 28)
 state <- c(X = 1, Y = 1, Z = 1)
@@ -52,12 +61,12 @@ plot(out)
 if (require(scatterplot3d))
   scatterplot3d(out[,-1], type = "l")
 
-  
-  
+
 # Conclusions
 
-This study which could be applied in diverse domains show the behavior of the atmosphere wich is usefull to predict not only space activites but also othe human activities on Earth. 
+This study which could be applied in diverse domains show the behavior of the atmosphere which is useful to predict not only space activities but also other human activities on Earth. 
 
 # References
 Soetaert K., Petzoldt T., Setzer R. W., (2019), Solvers for Initial Value Problems of Differential Equations
 ('ODE', 'DAE', 'DDE'), 1.24
+
