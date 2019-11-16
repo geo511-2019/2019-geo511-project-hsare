@@ -361,8 +361,10 @@ div.tocify {
 </div>
 
 
-<hr />
+<div id="head" class="section level2">
+<h2>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</h2>
 <p>title: “R to predict the chaos in the atmosphere” author: Hadarou Sare</p>
+</div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>One of the of advantage of coding is to be able to extract the exact information and predict natural phenomenon behaviors as well as the impact of human being on the environment in order to find the right solution at the right time. In that logic, R programing seem to be a suitable tool to propose a range of solutions to leaders who might decide what to do in any given situation in general but in the atmospheric behavior in particular which might slow not only the economy but also the conquest of new frontiers in space. In this project, we are interested in studying the chaos in the atmosphere because its behavior is extremely important for space exploration. In fact, any launch system built to send astronaut in space or deliver satelitte in space will take off if and only if the atmospheric conditions are favorable.</p>
@@ -392,6 +394,55 @@ div.tocify {
 <div id="references" class="section level1">
 <h1>References</h1>
 <p>Soetaert K., Petzoldt T., Setzer R. W., (2019), Solvers for Initial Value Problems of Differential Equations (‘ODE’, ‘DAE’, ‘DDE’), 1.24</p>
+<div id="section" class="section level2">
+<h2>=======</h2>
+<p>title: “R to predict the chaos in the atmosphere” author: Hadarou Sare</p>
+</div>
+</div>
+<div id="introduction-1" class="section level1">
+<h1>Introduction</h1>
+<p>One of the of advantage of coding is to be able to extract the exact information and predict natural phenomenon behaviors as well as the impact of human being on the environment in order to find the right solution at the right time. In that logic, R programing seem to be a suitable tool to propose a range of solutions to leaders who might decide what to do in any given situation in general but in the atmospheric behavior in particular which might slow not only the economy but also the conquest of new frontiers in space. In this project, we are interested in studying the chaos in the atmosphere because its behavior is extremely important for space exploration. In fact, any launch system built to send astronaut in space or deliver satelitte in space will take off if and only if the atmospheric conditions are favorable.</p>
+</div>
+<div id="materials-and-methods-1" class="section level1">
+<h1>Materials and methods</h1>
+<p>I firstly install the differential equation package followed by the “Desolve” packages. I then used the Lorenz function to specify the parameters in X-Y-Z direction which is 3D. After that I created my parameters (a, b, and c) I will use as well as the sequence time before plotting my results.</p>
+<p>Load any required packages in a code chunk (you may need to install some packages):</p>
+<p>install.packages(“ctv”) ctv::install.views(“DifferentialEquations”) library(deSolve)</p>
+<div id="download-and-clean-all-required-data-1" class="section level2">
+<h2>Download and clean all required data</h2>
+<p>Lorenz &lt;- function(t, state, parameters) { with(as.list(c(state, parameters)), { dX &lt;- a * X + Y * Z dY &lt;- b * (Y - Z) dZ &lt;- -X * Y + c * Y - Z list(c(dX, dY, dZ)) }) }</p>
+<p>parameters &lt;- c(a = -8/3, b = -10, c = 28) state &lt;- c(X = 1, Y = 1, Z = 1) times &lt;- seq(0, 100, by = 0.01) out &lt;- ode(y = state, times = times, func = Lorenz, parms = parameters) plot(out)</p>
+<p>Add any additional processing steps here.</p>
+</div>
+</div>
+<div id="results-1" class="section level1">
+<h1>Results</h1>
+<p>parameters &lt;- c(a = -8/3, b = -10, c = 28) state &lt;- c(X = 1, Y = 1, Z = 1) times &lt;- seq(0, 100, by = 0.01) out &lt;- ode(y = state, times = times, func = Lorenz, parms = parameters) plot(out)</p>
+<p>#add a 3D figure if package scatterplot3D is available</p>
+<p>if (require(scatterplot3d)) scatterplot3d(out[,-1], type = “l”)</p>
+</div>
+<div id="conclusions-1" class="section level1">
+<h1>Conclusions</h1>
+<p>This study which could be applied in diverse domains show the behavior of the atmosphere which is useful to predict not only space activities but also other human activities on Earth.</p>
+</div>
+<div id="references-1" class="section level1">
+<h1>References</h1>
+<p>Soetaert K., Petzoldt T., Setzer R. W., (2019), Solvers for Initial Value Problems of Differential Equations (‘ODE’, ‘DAE’, ‘DDE’), 1.24</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>78a4008af6a70b45ba798e1723eeb3d7766ed8f3</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
 </div>
 
 <!-- give the footer some space -->
