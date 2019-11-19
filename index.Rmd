@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 ---
 title: "R to predict the chaos in the atmosphere"
 author: Hadarou Sare
@@ -15,12 +15,12 @@ I firstly install the differential equation package followed by the â€œDesolveâ€
 
 
 
-Load any required packages in a code chunk (you may need to install some packages):
+#Load any required packages in a code chunk (you may need to install some packages):
 
 
-
-install.packages("ctv")
-ctv::install.views("DifferentialEquations")
+```{r}
+#install.packages("ctv")
+#ctv::install.views("DifferentialEquations")
 library(deSolve)
 
 
@@ -45,7 +45,7 @@ plot(out)
 
 
 
-Add any additional processing steps here.
+#Add any additional processing steps here.
 
 # Results
 
@@ -61,7 +61,7 @@ plot(out)
 
 if (require(scatterplot3d))
   scatterplot3d(out[,-1], type = "l")
-
+```
 
 # Conclusions
 
