@@ -367,69 +367,115 @@ div.tocify {
 </div>
 
 
-<div id="title-r-to-predict-the-chaos-in-the-atmosphere" class="section level1">
-<h1>Title: “R to predict the chaos in the atmosphere”</h1>
+<div id="title-using-landsat-data-to-map-the-surface-energy" class="section level1">
+<h1>Title: “Using Landsat data to map the surface Energy”</h1>
 </div>
 <div id="author-hadarou-sare" class="section level1">
 <h1>Author: Hadarou Sare</h1>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>One of the of advantage of coding is to be able to extract the exact information and predict natural phenomenon behaviors as well as the impact of human being on the environment in order to find the right solution at the right time. In that logic, R programing seem to be a suitable tool to propose a range of solutions to leaders who might decide what to do in any given situation in general but in the atmospheric behavior in particular which might slow not only the economy but also the conquest of new frontiers in space. In this project, we are interested in studying the chaos in the atmosphere because its behavior is extremely important for space exploration. In fact, any launch system built to send astronaut in space or deliver satelitte in space will take off if and only if the atmospheric conditions are favorable.</p>
+<p>The data provided by Landsat have always been useful in diverse domain such as mineral resources exploration, the evolution of vegetation, the climate change aspect by comparing data from different year,…Landsat is mostly use for Earth Observation and goes from Landsat 1 to Landsat8. Landsat8 has eight band ranging from the visible to the Thermal wavelength. Landsat7 and 8 reveal the surface reflectance of the soil. Lot of image processing algorithm such as Erdas Imagine, Envi, Qgis,.. allow experts to process the Landsat images and extract the information they are looking for. In this project, I intend to use R language to display the energy, i.e the heat, the temperature and the radiation from the Landsat images.</p>
 </div>
 <div id="materials-and-methods" class="section level1">
 <h1>Materials and methods</h1>
-<p>I firstly install the differential equation package followed by the “Desolve” packages. I then used the Lorenz function to specify the parameters in X-Y-Z direction which is 3D. After that I created my parameters (a, b, and c) I will use as well as the sequence time before plotting my results.</p>
+<p>I use Landsat, metric an water datas for this project as well as some supporting data such as sp data, raster data,rgal data.` Since Landsat data are very large in term of size, I firstly cropped my area of interest with the tool call “createAoi()”. This allow me to reduce the computational cost of processing my data. Secondly, to be able to run METRIC with Landsat data, I put my surface reflectance products in the working directory. I listed the content of the water package asa weel as the content of the landsat package.<br />
+I finally applied a metric estimation to my selected images and plot the surface energy reflectance.</p>
 <p>#Load any required packages in a code chunk (you may need to install some packages):</p>
-<pre class="r"><code>#install.packages(&quot;ctv&quot;)
-#ctv::install.views(&quot;DifferentialEquations&quot;)
-library(deSolve)
+<pre class="r"><code>library(rgdal)</code></pre>
+<pre><code>## Loading required package: sp</code></pre>
+<pre><code>## rgdal: version: 1.4-7, (SVN revision 845)
+##  Geospatial Data Abstraction Library extensions to R successfully loaded
+##  Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
+##  Path to GDAL shared files: C:/Users/Owner/Documents/R/win-library/3.6/rgdal/gdal
+##  GDAL binary built with GEOS: TRUE 
+##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+##  Path to PROJ.4 shared files: C:/Users/Owner/Documents/R/win-library/3.6/rgdal/proj
+##  Linking to sp version: 1.3-2</code></pre>
+<pre class="r"><code>library(sp)
+library(raster)
+library(landsat)
+library(landsat8)
+library(Metrics)
+library(water)</code></pre>
+<div id="download-and-clean-all-required-data" class="section level2">
+<h2>Download and clean all required data</h2>
+<pre class="r"><code>aoi &lt;- createAoi(topleft = c(350000, -350000), bottomright = c(520000, -3800000))
+raw_data_folder &lt;- system.file(&quot;extdata&quot;, package=&quot;water&quot;)
+image &lt;- loadImage(path=raw_data_folder, aoi=aoi, sat=&quot;L8&quot;)</code></pre>
+<pre><code>## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
 
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
 
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
 
-## Download and clean all required data
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
 
-Lorenz &lt;- function(t, state, parameters) {
-  with(as.list(c(state, parameters)), {
-    dX &lt;- a * X + Y * Z
-    dY &lt;- b * (Y - Z)
-    dZ &lt;- -X * Y + c * Y - Z
-    list(c(dX, dY, dZ))
-  })
-}
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
 
-parameters &lt;- c(a = -8/3, b = -10, c = 28)
-state &lt;- c(X = 1, Y = 1, Z = 1)
-times &lt;- seq(0, 100, by = 0.01)</code></pre>
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
+
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
+
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
+## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated</code></pre>
+<pre class="r"><code>image.SR &lt;- loadImageSR(path=raw_data_folder, aoi=aoi)</code></pre>
+<pre><code>## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
+## of S4 objects is deprecated</code></pre>
+<pre><code>## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
+## of S4 objects is deprecated
+
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
+## of S4 objects is deprecated
+
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
+## of S4 objects is deprecated
+
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
+## of S4 objects is deprecated
+
+## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
+## of S4 objects is deprecated</code></pre>
+</div>
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
-<pre class="r"><code>out &lt;- ode(y = state, times = times, func = Lorenz, parms = parameters)
-plot(out)
-
-
-#Add any additional processing steps here.
-
-parameters &lt;- c(a = -8/3, b = -10, c = 28)
-state &lt;- c(X = 1, Y = 1, Z = 1)
-times &lt;- seq(0, 100, by = 0.01)
-out &lt;- ode(y = state, times = times, func = Lorenz, parms = parameters)
-plot(out)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<pre class="r"><code>#add a 3D figure if package scatterplot3D is available
-
-if (require(scatterplot3d))
-  scatterplot3d(out[,-1], type = &quot;l&quot;)</code></pre>
-<pre><code>## Loading required package: scatterplot3d</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<pre class="r"><code>plot(image)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>#Add any additional processing steps here.</p>
+<pre class="r"><code>csvfile &lt;- system.file(&quot;extdata&quot;, &quot;INTA.csv&quot;, package=&quot;water&quot;)
+MTLfile &lt;- system.file(&quot;extdata&quot;, &quot;LC82320832016040LGN00_MTL.txt&quot;, package=&quot;water&quot;)
+WeatherStation &lt;- read.WSdata(WSdata = csvfile, 
+                              datetime.format =  &quot;%Y/%m/%d %H:%M&quot;, 
+                              columns=c(&quot;date&quot; = 1, &quot;time&quot; = 1, &quot;radiation&quot; = 3,
+                                        &quot;wind&quot; = 6, &quot;RH&quot; = 3, &quot;temp&quot; = 2, &quot;rain&quot; = 4), 
+                              lat=-33, long= -68.85, elev=800, height= 3,
+                              MTL=MTLfile)</code></pre>
+<pre><code>## Warning in read.WSdata(WSdata = csvfile, datetime.format = &quot;%Y/%m/%d %H:%M&quot;, :
+## As tz = &quot;&quot;, assuming the weather station time zone is America/New_York</code></pre>
+<p>#Plot the Energy</p>
+<pre class="r"><code>plot(Surface_Energy)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
-<p>This study which could be applied in diverse domains show the behavior of the atmosphere which is useful to predict not only space activities but also other human activities on Earth.</p>
+<p>R is a suitable tool not only for image processing but also for extraction of valuable information on satellite images. It is able to combine all separate eight Landsat images into a metadata to create a shapefile and then use that shapefile to highlight the characteristic of the study area. In this project, I was able not only to upload each Landsat image into R but also to process the data, create an AOI file and highlight the heat, the temperature and the radiation of the area of study.</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p>Soetaert K., Petzoldt T., Setzer R. W., (2019), Solvers for Initial Value Problems of Differential Equations (‘ODE’, ‘DAE’, ‘DDE’), 1.24</p>
+<p>Do Santos A., (2017), Landsat 8 Imagery Rescaled to Reflectance, Radiance and/or Temperature, 0.1-10</p>
+<p>Goslee S., (2012), Radiometric and topographic correction of satellite imagery, 1.0.8 Bivand R., Keitt T., Rowlingson B., Pebesma E., Summer M., Hijimas R., Rouault E., Warmerdan F., Ooms J., Rundel C., (2019), Bindings for the ‘Geospatial’ Data Abstraction Library, 1.4-7</p>
+<p>Hammer B., Frasco M., LeDell E., (2018), Evaluation Metrics for Machine Learning, 0.1.4</p>
+<p>Hijmans R. J., Etten J. V., Summer M., Cheng J., Bevan A., Bivand R., Busetto L., Canty M., Forrest D., Ghosh A., Golicher D., Gray J., Greenberg J. A., Hiemstra P., Karney C., Mattiuzzi M., Mosher S., Nowosad J., Pebesma E., Lamigueiro O. P., Racine E. B., Rowlingson B., Ahortridge A., Venables B., Wueest R.(2019), Geographic Data Analysis and Modeling, 3.0-7</p>
+<p>Olmedo G. F., Ortega-Farías S., Fonseca-Luengo D.,De la Fuente-Sáiz D., Peñailillo F. F., María Victoria Munafó, (2018), Actual Evapotranspiration with Energy Balance Models, 0.8</p>
+<p>Pebesma E., Bivand R., Rowlingson B., Gomez-Rubio V., Hijimans R., Summer M., MacQueen D., Lemon J., O’Brien J., O’Rourke J., (2019), Classes and Methods for Spatial Data, 1.3-2</p>
 </div>
 
 <!-- give the footer some space -->
