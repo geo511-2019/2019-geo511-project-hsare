@@ -367,115 +367,114 @@ div.tocify {
 </div>
 
 
-<div id="title-using-landsat-data-to-map-the-surface-energy" class="section level1">
-<h1>Title: “Using Landsat data to map the surface Energy”</h1>
+<div id="title-design-of-a-controller-to-stabilize-a-spacecrafts-attitude" class="section level1">
+<h1>Title: “Design of a Controller to stabilize a spacecraft’s Attitude”</h1>
 </div>
 <div id="author-hadarou-sare" class="section level1">
 <h1>Author: Hadarou Sare</h1>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>The data provided by Landsat have always been useful in diverse domain such as mineral resources exploration, the evolution of vegetation, the climate change aspect by comparing data from different year,…Landsat is mostly use for Earth Observation and goes from Landsat 1 to Landsat8. Landsat8 has eight band ranging from the visible to the Thermal wavelength. Landsat7 and 8 reveal the surface reflectance of the soil. Lot of image processing algorithm such as Erdas Imagine, Envi, Qgis,.. allow experts to process the Landsat images and extract the information they are looking for. In this project, I intend to use R language to display the energy, i.e the heat, the temperature and the radiation from the Landsat images.</p>
+<p>Space Exploration has always captivate the attention of all human being from women to men, from kids to adults. However, going to space is easier than developing the best vehicule to reach space. In fact, in order to conduct activity in space wether send human or robots, Aerospace Engineers need to come up with innovative ideas not only to build the spacecraft but mostly to stabilize it in order to allow it to perform its mission. For example, a spacecraft designed to capture an asteroids, mining it, and bringing its valuable resource back to Earth need a strong control system to be stable and perform its mission safely. In this project, I assumed a spacecraft with a non stable controller and design a new controller to stabilize the spacecraft.</p>
 </div>
 <div id="materials-and-methods" class="section level1">
 <h1>Materials and methods</h1>
-<p>I use Landsat, metric an water datas for this project as well as some supporting data such as sp data, raster data,rgal data.` Since Landsat data are very large in term of size, I firstly cropped my area of interest with the tool call “createAoi()”. This allow me to reduce the computational cost of processing my data. Secondly, to be able to run METRIC with Landsat data, I put my surface reflectance products in the working directory. I listed the content of the water package asa weel as the content of the landsat package.<br />
-I finally applied a metric estimation to my selected images and plot the surface energy reflectance.</p>
+<p>I use the Control package available in the library. Other than that I created all the rest of the data by myself. I firstly assume a controller for the system I called “Controller” and tried to see if that controller could stabilize the spacecraft by ploting its step response curve. After being sure that the system is unstable with that controller by looking at the poles of the system and the step response curve, I designed a controller I called “Controller2” with some parameters I choosed to make sure that it can stabilize the system of the spacecraft. I ploted the step response my the controller I designed to show that it can stabilize the system.</p>
 <p>#Load any required packages in a code chunk (you may need to install some packages):</p>
-<pre class="r"><code>library(rgdal)</code></pre>
-<pre><code>## Loading required package: sp</code></pre>
-<pre><code>## rgdal: version: 1.4-7, (SVN revision 845)
-##  Geospatial Data Abstraction Library extensions to R successfully loaded
-##  Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
-##  Path to GDAL shared files: C:/Users/Owner/Documents/R/win-library/3.6/rgdal/gdal
-##  GDAL binary built with GEOS: TRUE 
-##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
-##  Path to PROJ.4 shared files: C:/Users/Owner/Documents/R/win-library/3.6/rgdal/proj
-##  Linking to sp version: 1.3-2</code></pre>
-<pre class="r"><code>library(sp)
-library(raster)
-library(landsat)
-library(landsat8)
-library(Metrics)
-library(water)</code></pre>
-<div id="download-and-clean-all-required-data" class="section level2">
-<h2>Download and clean all required data</h2>
-<pre class="r"><code>aoi &lt;- createAoi(topleft = c(350000, -350000), bottomright = c(520000, -3800000))
-raw_data_folder &lt;- system.file(&quot;extdata&quot;, package=&quot;water&quot;)
-image &lt;- loadImage(path=raw_data_folder, aoi=aoi, sat=&quot;L8&quot;)</code></pre>
-<pre><code>## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(list.files(path = path, pattern =
-## paste0(image_pattern, : implicit list embedding of S4 objects is deprecated</code></pre>
-<pre class="r"><code>image.SR &lt;- loadImageSR(path=raw_data_folder, aoi=aoi)</code></pre>
-<pre><code>## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
-## of S4 objects is deprecated</code></pre>
-<pre><code>## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
-## of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
-## of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
-## of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
-## of S4 objects is deprecated
-
-## Warning in `[&lt;-`(`*tmp*`, i, value = raster(files[i])): implicit list embedding
-## of S4 objects is deprecated</code></pre>
+<pre class="r"><code>library(control)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;control&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     step</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     append</code></pre>
+<p>##Background</p>
+<p>A transfer function is a frequency domain, i.e. the ratio of the output to the input of the control system.</p>
+<div id="download-and-clean-all-required-data-1" class="section level2">
+<h2>Download and clean all required data (1)</h2>
+<pre class="r"><code>#Example of Transfer Function
+a &lt;- 10;  b &lt;- 7;  k &lt;- 3
+TF(&quot;1/(a*s^2 + b *s + k)&quot;)</code></pre>
+<pre><code>## 
+## y1:
+##                 1 
+##   - - - - - - - - - - -
+##     10 s^2 + 7 s + 3 
+## 
+## 
+## Transfer Function: Continuous time model</code></pre>
+<p>Spacecraft’s natural controller Transfer function for example originally assumed that it can stabilize the system but depending of changes it may need to be tested to see if it can stabilize the system or not</p>
+</div>
+<div id="download-and-clean-all-required-data-2" class="section level2">
+<h2>Download and clean all required data (2)</h2>
+<pre class="r"><code>e &lt;- 0.000003;
+m &lt;- 0.000003;
+p &lt;- 0.03;
+d &lt;- 4;
+w &lt;- 0.000003;
+Controller &lt;- TF(&quot;p/(s*((e*s + m)*(w*s + d) + p^2))&quot;)
+time &lt;- seq(0,0.2,0.001)</code></pre>
 </div>
 </div>
 <div id="results" class="section level1">
 <h1>Results</h1>
-<pre class="r"><code>plot(image)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>#Add any additional processing steps here.</p>
-<pre class="r"><code>csvfile &lt;- system.file(&quot;extdata&quot;, &quot;INTA.csv&quot;, package=&quot;water&quot;)
-MTLfile &lt;- system.file(&quot;extdata&quot;, &quot;LC82320832016040LGN00_MTL.txt&quot;, package=&quot;water&quot;)
-WeatherStation &lt;- read.WSdata(WSdata = csvfile, 
-                              datetime.format =  &quot;%Y/%m/%d %H:%M&quot;, 
-                              columns=c(&quot;date&quot; = 1, &quot;time&quot; = 1, &quot;radiation&quot; = 3,
-                                        &quot;wind&quot; = 6, &quot;RH&quot; = 3, &quot;temp&quot; = 2, &quot;rain&quot; = 4), 
-                              lat=-33, long= -68.85, elev=800, height= 3,
-                              MTL=MTLfile)</code></pre>
-<pre><code>## Warning in read.WSdata(WSdata = csvfile, datetime.format = &quot;%Y/%m/%d %H:%M&quot;, :
-## As tz = &quot;&quot;, assuming the weather station time zone is America/New_York</code></pre>
-<p>#Plot the Energy</p>
-<pre class="r"><code>plot(Surface_Energy)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>stepplot(Controller, t = time)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>#Is the system Stable?</p>
+<p>From the above plot showing the system’s step response, it is clear that the system is unstable. The Stability of the system can also be determine by looking at the poles of the system.</p>
+<pre class="r"><code>pole(Controller)</code></pre>
+<pre><code>##               [,1]
+## [1,]  0.000000e+00
+## [2,] -1.333258e+06
+## [3,] -7.600428e+01</code></pre>
+<p>As shown above, one of the poles of the open-loop transfer function is on the imaginary axis while the other two poles are in the left half of the complex s-plane. So the system is not stable.</p>
+<p>Since the system is not stable, we need to We can add feedback controller and then investigate the system’s closed-loop step response for stability</p>
+<p>#Closed-Loop Response of the Controller</p>
+<pre class="r"><code> Controller2&lt;- feedback(Controller, 1)
+print(Controller2)</code></pre>
+<pre><code>## 
+## y1:
+##                                             0.03 
+##   - - - - - - - - - - - - - - - - - - - - - - - - - - -
+##     9e-12 s^3 + 1.200001e-05 s^2 + 0.000912 s + 0.03 
+## 
+## 
+## Transfer Function: Continuous time model</code></pre>
+<p>#Plot</p>
+<pre class="r"><code>stepplot(Controller2, t = time)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="672" /> The above closed-loop step response shows that the addition of feedback has stabilized the system.</p>
+<p>#The Damping an dNatural Frequency Data</p>
+<pre class="r"><code>damp(Controller2)</code></pre>
+<pre><code>## 
+##      Eigenvalue            Damping     Freq. (rad/s)    Freq. (Hz). 
+##      ----------            -------     -------------    -----------
+## -38.00     +     32.50j   0.76           50.00</code></pre>
+<pre><code>## Warning in sprintf(&quot;%-10.2f&quot;, omegahz[i]): imaginary parts discarded in coercion</code></pre>
+<pre><code>## 0.39      
+## -38.00     -     32.50j   0.76           50.00</code></pre>
+<pre><code>## Warning in sprintf(&quot;%-10.2f&quot;, omegahz[i]): imaginary parts discarded in coercion</code></pre>
+<pre><code>## 0.39      
+## -1333258.33 +      0.00j   1.00           1333258.33</code></pre>
+<pre><code>## Warning in sprintf(&quot;%-10.2f&quot;, omegahz[i]): imaginary parts discarded in coercion</code></pre>
+<pre><code>## 0.00</code></pre>
+<pre><code>## $omega
+##              [,1]
+## [1,] 5.000141e+01
+## [2,] 5.000141e+01
+## [3,] 1.333258e+06
+## 
+## $zeta
+## [1] 0.7600026 0.7600026 1.0000000</code></pre>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
-<p>R is a suitable tool not only for image processing but also for extraction of valuable information on satellite images. It is able to combine all separate eight Landsat images into a metadata to create a shapefile and then use that shapefile to highlight the characteristic of the study area. In this project, I was able not only to upload each Landsat image into R but also to process the data, create an AOI file and highlight the heat, the temperature and the radiation of the area of study.</p>
+<p>R is a suitable tool not only to explore the stability of a system but also to design a controller that will be able to stabilize the spacecraft. Most of the Aerospace Engineers use Matlab which is a software with lot of tools for spacecraft’s controller design in term of ploting the Bode diagram, ploting the compensated and uncompensated system, getting the gain margin and the phase margin,..but I am sure R is also a good tool and could perform some of the work we do in Aerospace using Matlab.</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
-<p>Do Santos A., (2017), Landsat 8 Imagery Rescaled to Reflectance, Radiance and/or Temperature, 0.1-10</p>
-<p>Goslee S., (2012), Radiometric and topographic correction of satellite imagery, 1.0.8 Bivand R., Keitt T., Rowlingson B., Pebesma E., Summer M., Hijimas R., Rouault E., Warmerdan F., Ooms J., Rundel C., (2019), Bindings for the ‘Geospatial’ Data Abstraction Library, 1.4-7</p>
-<p>Hammer B., Frasco M., LeDell E., (2018), Evaluation Metrics for Machine Learning, 0.1.4</p>
-<p>Hijmans R. J., Etten J. V., Summer M., Cheng J., Bevan A., Bivand R., Busetto L., Canty M., Forrest D., Ghosh A., Golicher D., Gray J., Greenberg J. A., Hiemstra P., Karney C., Mattiuzzi M., Mosher S., Nowosad J., Pebesma E., Lamigueiro O. P., Racine E. B., Rowlingson B., Ahortridge A., Venables B., Wueest R.(2019), Geographic Data Analysis and Modeling, 3.0-7</p>
-<p>Olmedo G. F., Ortega-Farías S., Fonseca-Luengo D.,De la Fuente-Sáiz D., Peñailillo F. F., María Victoria Munafó, (2018), Actual Evapotranspiration with Energy Balance Models, 0.8</p>
-<p>Pebesma E., Bivand R., Rowlingson B., Gomez-Rubio V., Hijimans R., Summer M., MacQueen D., Lemon J., O’Brien J., O’Rourke J., (2019), Classes and Methods for Spatial Data, 1.3-2</p>
+<p>Ubah B. C., (2017), A Control System Toolbox, 0.2.5</p>
 </div>
 
 <!-- give the footer some space -->
