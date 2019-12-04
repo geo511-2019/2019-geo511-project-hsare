@@ -2,18 +2,18 @@
 
 
 
-# Title: "Design of a Controller to stabilize a spacecraft's Attitude"
+# Title: "Design a Controller to stabilize a spacecraft's Attitude"
 # Author: Hadarou Sare
 
 
 # Introduction
-Space Exploration has always captivate the attention of all human being from women to men, from kids to adults. However, going to space is easier than developing the best vehicule to reach space. In fact, in order to conduct activity in space wether send human or robots, Aerospace Engineers need to come up with innovative ideas not only to build the spacecraft but mostly to stabilize it in order to allow it to perform its mission. For example, a spacecraft designed to capture an asteroids, mining it, and bringing its valuable resource back to Earth need a strong control system to be stable and perform its mission safely.
-In this project, I assumed a spacecraft with a non stable controller and design a new controller to stabilize the spacecraft.
+Space Exploration has always captivated the attention of all human being from women to men, from kids to adults. However, going to space is much more easier than developing the best vehicle with the right control system to reach space. In fact, in order to conduct activities in space (send human or robots, do science,...), Aerospace Engineers need to come up with innovative ideas not only to build the spacecraft but mostly to stabilize it in order to allow it to perform its mission. For example, a spacecraft designed to capture an asteroids, mining it, and bring its valuable resource back to Earth need a strong control system to be stable and perform its mission safely.
+In this project, I assumed that the transfer function system of a spacecraft I call "Controller" is unstable and I design (implememt) a new controller to stabilize the spacecraft.
 
 # Materials and methods
 
 I use the Control package available in the library. Other than that I created all the rest of the data by myself.
-I firstly assume a controller for the system I called "Controller" and tried to see if that controller could stabilize the spacecraft by ploting its step response curve. After being sure that the system is unstable with that controller by looking at the poles of the system and the step response curve, I designed a controller I called "Controller2" with some parameters I choosed to make sure that it can stabilize the system of the spacecraft. I ploted the step response my the controller I designed to show  that it can stabilize the system.
+I firstly assumed a chosen transfer function system of the spacecraft I called "Controller" and tried to see if that controller could stabilize the spacecraft by ploting its step response curve. After being sure that the system is unstable with that controller by looking at the poles of the system and its step response curve, I designed a controller I called "Controller2" with some parameters I choose to make sure that it can stabilize the system of the spacecraft. I ploted the step response of the controller I designed to show  that it can stabilize the system.
 
 
 
@@ -25,7 +25,8 @@ I firstly assume a controller for the system I called "Controller" and tried to 
 library(control)
 
 ```
-##Background
+
+# Definition of Transfer Function
 
 A transfer function is a frequency domain, i.e. the ratio of the output to the input of the control system.
 
@@ -36,7 +37,7 @@ A transfer function is a frequency domain, i.e. the ratio of the output to the i
 a <- 10;  b <- 7;  k <- 3
 TF("1/(a*s^2 + b *s + k)")
 ```
-Spacecraft's natural  controller Transfer function for example originally assumed that it can stabilize the system but depending of changes it may need to be tested to  see if it can stabilize the system or not
+Some transfer function are able to stabilize the system of a spacecraft without the need of designing or implementing a controller but depending on diverse factors such as forces acting on the sapcecraft, gravity torques,...the transfer function only might not be able to stabilize the spacecraft. So it is always better to test its stability  depending on the mission we want to perform.
 
 ## Download and clean all required data (2)
 
@@ -60,17 +61,16 @@ stepplot(Controller, t = time)
 
 #Is the system Stable?
 
-From the above plot showing the system’s step response, it is clear that the system is unstable. The Stability of the system can also be determine by looking at the poles of the system.
+From the plot of the system’s step response, it is clear that the system is unstable. The Stability of the system can also be determined by looking at the poles of the system.
 
 ```{r}
 
 pole(Controller)
 ```
-As shown above, one of the poles of the open-loop transfer function is on the imaginary axis
-while the other two poles are in the left half of the complex s-plane. So the system is not stable.
+One of the poles of the open-loop transfer function is on the imaginary axis and the other two poles are in the left half of the complex s-plane. So the system is not stable.
 
 
-Since the system is not stable, we need to We can add feedback controller and then investigate the system’s closed-loop step response for stability
+Since the system is not stable, we need to add a feedback controller and check the closed-loop step response of the system to see if it is stable or not.
 
 #Closed-Loop Response of the Controller
 ```{r}
@@ -85,16 +85,9 @@ print(Controller2)
 stepplot(Controller2, t = time)
 
 ```
-The above closed-loop step response shows that the addition of feedback has stabilized the system.
+The closed-loop step response shows that the system is stable after adding a feedback controller. Then the spacecraft's attitude is stabilized by the feedback controller.
 
 
-#The Damping an dNatural Frequency Data
-
-```{r}
-
-damp(Controller2)
-
-```
 
 # Conclusions
 

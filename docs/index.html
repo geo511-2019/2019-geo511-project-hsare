@@ -367,19 +367,19 @@ div.tocify {
 </div>
 
 
-<div id="title-design-of-a-controller-to-stabilize-a-spacecrafts-attitude" class="section level1">
-<h1>Title: “Design of a Controller to stabilize a spacecraft’s Attitude”</h1>
+<div id="title-design-a-controller-to-stabilize-a-spacecrafts-attitude" class="section level1">
+<h1>Title: “Design a Controller to stabilize a spacecraft’s Attitude”</h1>
 </div>
 <div id="author-hadarou-sare" class="section level1">
 <h1>Author: Hadarou Sare</h1>
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Space Exploration has always captivate the attention of all human being from women to men, from kids to adults. However, going to space is easier than developing the best vehicule to reach space. In fact, in order to conduct activity in space wether send human or robots, Aerospace Engineers need to come up with innovative ideas not only to build the spacecraft but mostly to stabilize it in order to allow it to perform its mission. For example, a spacecraft designed to capture an asteroids, mining it, and bringing its valuable resource back to Earth need a strong control system to be stable and perform its mission safely. In this project, I assumed a spacecraft with a non stable controller and design a new controller to stabilize the spacecraft.</p>
+<p>Space Exploration has always captivated the attention of all human being from women to men, from kids to adults. However, going to space is much more easier than developing the best vehicle with the right control system to reach space. In fact, in order to conduct activities in space (send human or robots, do science,…), Aerospace Engineers need to come up with innovative ideas not only to build the spacecraft but mostly to stabilize it in order to allow it to perform its mission. For example, a spacecraft designed to capture an asteroids, mining it, and bring its valuable resource back to Earth need a strong control system to be stable and perform its mission safely. In this project, I assumed that the transfer function system of a spacecraft I call “Controller” is unstable and I design (implememt) a new controller to stabilize the spacecraft.</p>
 </div>
 <div id="materials-and-methods" class="section level1">
 <h1>Materials and methods</h1>
-<p>I use the Control package available in the library. Other than that I created all the rest of the data by myself. I firstly assume a controller for the system I called “Controller” and tried to see if that controller could stabilize the spacecraft by ploting its step response curve. After being sure that the system is unstable with that controller by looking at the poles of the system and the step response curve, I designed a controller I called “Controller2” with some parameters I choosed to make sure that it can stabilize the system of the spacecraft. I ploted the step response my the controller I designed to show that it can stabilize the system.</p>
+<p>I use the Control package available in the library. Other than that I created all the rest of the data by myself. I firstly assumed a chosen transfer function system of the spacecraft I called “Controller” and tried to see if that controller could stabilize the spacecraft by ploting its step response curve. After being sure that the system is unstable with that controller by looking at the poles of the system and its step response curve, I designed a controller I called “Controller2” with some parameters I choose to make sure that it can stabilize the system of the spacecraft. I ploted the step response of the controller I designed to show that it can stabilize the system.</p>
 <p>#Load any required packages in a code chunk (you may need to install some packages):</p>
 <pre class="r"><code>library(control)</code></pre>
 <pre><code>## 
@@ -390,7 +390,9 @@ div.tocify {
 <pre><code>## The following object is masked from &#39;package:base&#39;:
 ## 
 ##     append</code></pre>
-<p>##Background</p>
+</div>
+<div id="definition-of-transfer-function" class="section level1">
+<h1>Definition of Transfer Function</h1>
 <p>A transfer function is a frequency domain, i.e. the ratio of the output to the input of the control system.</p>
 <div id="download-and-clean-all-required-data-1" class="section level2">
 <h2>Download and clean all required data (1)</h2>
@@ -405,7 +407,7 @@ TF(&quot;1/(a*s^2 + b *s + k)&quot;)</code></pre>
 ## 
 ## 
 ## Transfer Function: Continuous time model</code></pre>
-<p>Spacecraft’s natural controller Transfer function for example originally assumed that it can stabilize the system but depending of changes it may need to be tested to see if it can stabilize the system or not</p>
+<p>Some transfer function are able to stabilize the system of a spacecraft without the need of designing or implementing a controller but depending on diverse factors such as forces acting on the sapcecraft, gravity torques,…the transfer function only might not be able to stabilize the spacecraft. So it is always better to test its stability depending on the mission we want to perform.</p>
 </div>
 <div id="download-and-clean-all-required-data-2" class="section level2">
 <h2>Download and clean all required data (2)</h2>
@@ -423,14 +425,14 @@ time &lt;- seq(0,0.2,0.001)</code></pre>
 <pre class="r"><code>stepplot(Controller, t = time)</code></pre>
 <p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>#Is the system Stable?</p>
-<p>From the above plot showing the system’s step response, it is clear that the system is unstable. The Stability of the system can also be determine by looking at the poles of the system.</p>
+<p>From the plot of the system’s step response, it is clear that the system is unstable. The Stability of the system can also be determined by looking at the poles of the system.</p>
 <pre class="r"><code>pole(Controller)</code></pre>
 <pre><code>##               [,1]
 ## [1,]  0.000000e+00
 ## [2,] -1.333258e+06
 ## [3,] -7.600428e+01</code></pre>
-<p>As shown above, one of the poles of the open-loop transfer function is on the imaginary axis while the other two poles are in the left half of the complex s-plane. So the system is not stable.</p>
-<p>Since the system is not stable, we need to We can add feedback controller and then investigate the system’s closed-loop step response for stability</p>
+<p>One of the poles of the open-loop transfer function is on the imaginary axis and the other two poles are in the left half of the complex s-plane. So the system is not stable.</p>
+<p>Since the system is not stable, we need to add a feedback controller and check the closed-loop step response of the system to see if it is stable or not.</p>
 <p>#Closed-Loop Response of the Controller</p>
 <pre class="r"><code> Controller2&lt;- feedback(Controller, 1)
 print(Controller2)</code></pre>
@@ -444,29 +446,7 @@ print(Controller2)</code></pre>
 ## Transfer Function: Continuous time model</code></pre>
 <p>#Plot</p>
 <pre class="r"><code>stepplot(Controller2, t = time)</code></pre>
-<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="672" /> The above closed-loop step response shows that the addition of feedback has stabilized the system.</p>
-<p>#The Damping an dNatural Frequency Data</p>
-<pre class="r"><code>damp(Controller2)</code></pre>
-<pre><code>## 
-##      Eigenvalue            Damping     Freq. (rad/s)    Freq. (Hz). 
-##      ----------            -------     -------------    -----------
-## -38.00     +     32.50j   0.76           50.00</code></pre>
-<pre><code>## Warning in sprintf(&quot;%-10.2f&quot;, omegahz[i]): imaginary parts discarded in coercion</code></pre>
-<pre><code>## 0.39      
-## -38.00     -     32.50j   0.76           50.00</code></pre>
-<pre><code>## Warning in sprintf(&quot;%-10.2f&quot;, omegahz[i]): imaginary parts discarded in coercion</code></pre>
-<pre><code>## 0.39      
-## -1333258.33 +      0.00j   1.00           1333258.33</code></pre>
-<pre><code>## Warning in sprintf(&quot;%-10.2f&quot;, omegahz[i]): imaginary parts discarded in coercion</code></pre>
-<pre><code>## 0.00</code></pre>
-<pre><code>## $omega
-##              [,1]
-## [1,] 5.000141e+01
-## [2,] 5.000141e+01
-## [3,] 1.333258e+06
-## 
-## $zeta
-## [1] 0.7600026 0.7600026 1.0000000</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" width="672" /> The closed-loop step response shows that the system is stable after adding a feedback controller. Then the spacecraft’s attitude is stabilized by the feedback controller.</p>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
